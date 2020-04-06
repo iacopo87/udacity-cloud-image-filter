@@ -29,14 +29,21 @@ import { filterImageFromURL, deleteLocalFiles } from "./util/util";
   //Add an endpoint to GET a specific resource by Primary Key
   app.get("/filteredimage", async (req: Request, res: Response) => {
     let { image_url } = req.query;
+    let filterdImagePath: string;
 
     if (!image_url) {
       return res.status(422).send(`image_url is required`);
     }
 
-    const filterdImagePath = await filterImageFromURL(image_url);
+    try {
+      filterdImagePath = await filterImageFromURL(image_url);
+    } catch {
+      res.status(423).send(`the image_url is not a valid image URL`);
+    }
 
-    res.sendFile(filterdImagePath, () => deleteLocalFiles([filterdImagePath]));
+    res
+      .status(200)
+      .sendFile(filterdImagePath, () => deleteLocalFiles([filterdImagePath]));
   });
 
   /**************************************************************************** */
