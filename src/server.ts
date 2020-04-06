@@ -37,8 +37,8 @@ import { filterImageFromURL, deleteLocalFiles } from "./util/util";
 
     try {
       filterdImagePath = await filterImageFromURL(image_url);
-    } catch {
-      res.status(423).send(`the image_url is not a valid image URL`);
+    } catch (e) {
+      res.status(400).send(`the image_url is not a valid image URL`);
     }
 
     res
