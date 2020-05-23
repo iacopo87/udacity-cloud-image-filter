@@ -1,0 +1,45 @@
+###################
+# ANSIBLE globals #
+###################
+
+ansible_connection: local
+
+#####################
+# ENV-specific vars #
+#####################
+
+env: "dev"
+
+#################
+# ROLES globals #
+#################
+
+region: "eu-west-2"
+
+# (THIS) eks_cluster_name: used for EKS service to set an exactly cluster's name - "{{ eks_cluster_name }}"
+# (AUTO) eks_cluster_stack_name: used for CloudFormation service to format a stack's name as "eksctl-{{ eks_cluster_name }}-cluster"
+# (AUTO) eks_nodegroup_stack_name: used for CloudFormation service to format a stack's name as "eksctl-{{ eks_cluster_name }}-nodegroup-{{ worker-nodes-name }}"
+eks_cluster_name: "devops-eks-{{ env }}"
+
+# used bythe cloudformation role to st a stack's name
+cf_stack_name: "eksctl-{{ eks_cluster_name }}-stack"
+
+##################
+# ROLES specific #
+##################
+
+# cloudforation role
+vpc_cidr: "10.0.0.0/16"
+PublicSubnet1CIDR: "10.0.0.0/24"
+PublicSubnet2CIDR: "10.0.1.0/24"
+PrivateSubnet1CIDR: "10.0.2.0/24"
+PrivateSubnet2CIDR: "10.0.3.0/24"
+
+# eksctl role
+k8s_version: 1.15
+k8s_worker_nodes_group_name: "worker-nodes"
+k8s_worker_nodes_instance_type: "t3.medium"
+k8s_worker_nodes_capacity: 2
+
+eks_root_user_name: "jenkins"
+eks_root_user_arn: "arn:aws:iam::373725836099:user/jenkins"

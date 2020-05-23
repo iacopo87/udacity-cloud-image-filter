@@ -1,0 +1,18 @@
+- name: "Create EKS {{ cf_stack_name | upper }} CloudFormation stack"
+  cloudformation:
+    region: "{{ region }}"
+    stack_name: "{{ cf_stack_name }}"
+    state: "present"
+    disable_rollback: true
+    template: "./roles/cloudformation/templates/network.yml"
+    template_parameters:
+      EnvironmentName: "Udacity-DevOps-capstone-{{ env }}"
+      VpcCIDR: "{{ vpc_cidr }}"
+      PublicSubnet1CIDR: "{{ PublicSubnet1CIDR }}"
+      PublicSubnet2CIDR: "{{ PublicSubnet2CIDR }}"
+      PrivateSubnet1CIDR: "{{ PrivateSubnet1CIDR }}"
+      PrivateSubnet2CIDR: "{{ PrivateSubnet2CIDR }}"
+    tags:
+      Stack: "{{ cf_stack_name }}"
+      Env: "{{ env }}"
+      EKS-cluster: "{{ eks_cluster_name }}"

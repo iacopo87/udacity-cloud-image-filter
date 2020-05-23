@@ -1,0 +1,8 @@
+- hosts:
+    - all
+  become: true
+  roles:
+    - role: cloudformation
+      tags: infra
+    - role: eksctl
+      tags: eks
