@@ -6,7 +6,7 @@ pipeline {
     stages {
         stage('Build') {
              steps {
-                 sh 'npm ci'
+                 sh 'npm i'
              }
         }
         stage('Lint Typescript') {
