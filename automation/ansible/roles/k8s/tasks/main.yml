@@ -1,0 +1,94 @@
+- k8s_info:
+    kind: Service
+    label_selectors:
+      - service = app-blue
+  register: color_service
+  tags:
+    - deployment
+    - service
+
+- k8s_info:
+    kind: Deployment
+    label_selectors:
+      - service = app-blue
+  register: color_deployment
+  tags:
+    - deployment
+    - service
+
+# - name: print all returned values
+#   tags:
+#     - deployment
+#     - service
+#   debug:
+#     msg: "color_service:{{ color_service }} color_deployment:{{ color_deployment }} resources:{{ color_deployment.resources }} resources:{{ color_deployment.resources|length  }}"
+
+- name: "setup missing color deployment"
+  tags:
+    - deployment
+  set_fact:
+    color: "{{ 'blue' if (color_deployment.resources|length == 0) else 'green' }}"
+
+- name: "setup missing color service"
+  tags:
+    - service
+  set_fact:
+    color: "{{ 'blue' if (color_service.resources|length == 0) else 'green' }}"
+
+# create a deployment file and apply it
+- name: "Generate {{ color }}-deployment.yml"
+  tags:
+    - deployment
+  template:
+    src: "deployment.yml.j2"
+    dest: "/tmp/{{ color }}-deployment.yml"
+
+- name: "Apply {{ color }} deployment"
+  tags:
+    - deployment
+  command: "kubectl apply -f /tmp/{{ color }}-deployment.yml"
+
+# create a service file and apply it
+- name: "Generate {{ color }}-service.yml"
+  tags:
+    - service
+  template:
+    src: "service.yml.j2"
+    dest: "/tmp/{{ color }}-service.yml"
+
+- name: "Apply {{ color }} service"
+  tags:
+    - service
+  command: "kubectl apply -f /tmp/{{ color }}-service.yml"
+
+- name: "setup missing color deployment"
+  tags:
+    - service
+  set_fact:
+    color: "{{ 'blue' if (color == 'green') else 'green' }}"
+
+# create a deployment file for the resource to delete
+- name: "Generate {{ color }}-deployment.yml"
+  tags:
+    - service
+  template:
+    src: "deployment.yml.j2"
+    dest: "/tmp/{{ color }}-deployment.yml"
+
+# create a service file for the resource to delete
+- name: "Generate {{ color }}-service.yml"
+  tags:
+    - service
+  template:
+    src: "service.yml.j2"
+    dest: "/tmp/{{ color }}-service.yml"
+
+# delete old deployment and service
+- name: "delete {{ color }} deployment"
+  tags:
+    - service
+  command: "kubectl delete -f /tmp/{{ color }}-deployment.yml"
+- name: "delete {{ color }} service"
+  tags:
+    - service
+  command: "kubectl delete -f /tmp/{{ color }}-service.yml"

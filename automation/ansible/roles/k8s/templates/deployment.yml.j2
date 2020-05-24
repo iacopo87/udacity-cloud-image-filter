@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  labels:
+    service: "app-{{ color }}"
+  name: "app-{{ color }}"
+spec:
+  replicas: 2
+  selector:
+      service: "app-{{ color }}"
+  template:
+    metadata:
+      labels:
+        service: "app-{{ color }}"
+    spec:
+      containers:
+      - name: "app-{{ color }}"
+        image: iacopoiacopo/cloudimagefilter
+        ports:
+        - containerPort: 8080
