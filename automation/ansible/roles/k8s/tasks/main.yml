@@ -8,7 +8,7 @@
     - service
 
 - k8s_info:
-    kind: Deployment
+    kind: ReplicationController
     label_selectors:
       - service = app-blue
   register: color_deployment
