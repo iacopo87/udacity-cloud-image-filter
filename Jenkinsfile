@@ -41,46 +41,37 @@ pipeline {
             }
         }
         stage('Deploy for production') {
-            stage('AWS Credentials') {            
-                steps {
-                    withCredentials([[
-                        $class: 'AmazonWebServicesCredentialsBinding',
-                        credentialsId: 'aws',
-                        accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-                        secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
-                    ]])            
-                    sh """
-                        mkdir -p ~/.aws
-                        echo "[default]" >~/.aws/credentials
-                        echo "[default]" >~/.boto
-                        echo "aws_access_key_id = ${AWS_ACCESS_KEY_ID}" >> ~/.boto
-                        echo "aws_secret_access_key = ${AWS_SECRET_ACCESS_KEY}" >> ~/.boto
-                        echo "aws_access_key_id = ${AWS_ACCESS_KEY_ID}" >> ~/.aws/credentials
-                        echo "aws_secret_access_key = ${AWS_SECRET_ACCESS_KEY}" >> ~/.aws/credentials
-                    """
-                    }
-            }
-            stage('Create Network Infrastacture and Cluster') {
-                steps {
-                    script {
-                        sh 'cd automation/ansible && ansible-playbook ./automation/ansible/main.yml && cd ../..'
+            stages {
+                stage('Create Network Infrastacture and Cluster') {
+                    steps {
+                        withAWS(region:'eu-west-2', credentials:'jenkins') {
+                            script {
+                                sh 'cd automation/ansible && ansible-playbook main.yml && cd ../..'
+                            }
+                        }
                     }
                 }
-            }
-            stage('Deployment') {
-                steps {
-                    script {
-                        sh 'cd automation/ansible && ansible-playbook ./automation/ansible/deploy.yml --tags "deployment" && cd ../..'
+                stage('Deployment') {
+                    steps {
+                        withAWS(region:'eu-west-2', credentials:'jenkins') {
+                            script {
+                                sh 'cd automation/ansible && ansible-playbook deploy.yml --tags "deployment" && cd ../..'
+                            }
+                        }
                     }
                 }
-            }
-            stage("User input confirm switch"){
-                input "Do you want to switch to the newly deployed version?"
-            }
-            stage('Redirect traffic to new cluster') {
-                steps {
-                    script {
-                        sh 'cd automation/ansible && ansible-playbook ./automation/ansible/deploy.yml --tags "service" && cd ../..'
+                stage("User input confirm switch") {
+                    steps {
+                        input(message: "Do you want to switch to the newly deployed version?")
+                    }
+                }
+                stage('Redirect traffic to new cluster') {
+                    steps {
+                        withAWS(region:'eu-west-2', credentials:'jenkins') {
+                            script {
+                                sh 'cd automation/ansible && ansible-playbook deploy.yml --tags "service" && cd ../..'
+                            }
+                        }
                     }
                 }
             }

@@ -35,3 +35,6 @@
 
 - name: "Update aws-auth ConfigMap with the EKS root user {{ eks_root_user_name | upper }}"
   command: "eksctl --region {{ region }} create iamidentitymapping --cluster {{ eks_cluster_name }} --arn {{ eks_root_user_arn }} --group system:masters --username {{  eks_root_user_name }}"
+
+- name: "set proper context"
+  command: "aws eks --region {{ region }} update-kubeconfig --name {{ eks_cluster_name }}"
