@@ -22,7 +22,7 @@ import { deleteLocalFiles, filterImageFromURL } from "./util/util";
     }
 
     try {
-      filterdImagePath = await filterImageFromURL(image_url);
+      filterdImagePath = await filterImageFromURL(image_url as string);
     } catch (e) {
       res.status(400).send(`the image_url is not a valid image URL`);
     }
