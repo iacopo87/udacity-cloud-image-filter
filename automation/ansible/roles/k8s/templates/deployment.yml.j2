@@ -16,5 +16,6 @@ spec:
       containers:
       - name: "app-{{ color }}"
         image: iacopoiacopo/cloudimagefilter
+        imagePullPolicy: Always
         ports:
         - containerPort: 8080

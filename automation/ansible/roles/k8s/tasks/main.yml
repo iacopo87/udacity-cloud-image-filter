@@ -16,12 +16,12 @@
     - deployment
     - service
 
-# - name: print all returned values
-#   tags:
-#     - deployment
-#     - service
-#   debug:
-#     msg: "color_service:{{ color_service }} color_deployment:{{ color_deployment }} resources:{{ color_deployment.resources }} resources:{{ color_deployment.resources|length  }}"
+- name: print all returned values
+  tags:
+    - deployment
+    - service
+  debug:
+    msg: "color_service:{{ color_service }} color_deployment:{{ color_deployment }} resources:{{ color_deployment.resources }} resources:{{ color_deployment.resources|length  }}"
 
 - name: "setup missing color deployment"
   tags:
